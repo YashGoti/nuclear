@@ -1,0 +1,13 @@
+#!/bin/bash
+
+tmpPath=$(cat config.json | jq -r .[].paths[].tmpPath | grep -ivE null)
+outPath=$(cat config.json | jq -r .[].paths[].outPath | grep -ivE null)
+
+if [[ -z $@ ]];then
+	echo -e "subtakeover : Specify Target Domain"
+else
+	domain=$1
+	subsfile=$2
+	mkdir -p $tmpPath $tmpPath/$domain $outPath $outPath/$domain
+	tools/nuclei -l $subsfile -c 25 -t tools/nuclei-templates/subdomain-takeover/ -o $outPath/$domain/subtakeover.txt -silent
+fi

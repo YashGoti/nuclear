@@ -1,0 +1,18 @@
+#!/bin/bash
+
+tmpPath=$(cat config.json | jq -r .[].paths[].tmpPath | grep -ivE null)
+outPath=$(cat config.json | jq -r .[].paths[].outPath | grep -ivE null)
+
+if [[ -z $@ ]];then
+	echo -e "subs : Specify Target Domain"
+else
+	domain=$1
+	file=$2
+	mkdir -p $tmpPath $tmpPath/$domain $outPath $outPath/$domain
+	tools/httpx -l $2 -silent -follow-host-redirects -status-code -mc 200,204,301,302,401,403,500 -threads 125 -timeout 3 -no-color > $tmpPath/$domain/httpx.txt
+	cat $tmpPath/$domain/httpx.txt | cut -d ' ' -f1 | tee $outPath/$domain/probesubdomains.txt
+	echo -e ""
+	cat $outPath/$domain/probesubdomains.txt | cut -d '/' -f3 | tee $outPath/$domain/livesubdomains.txt
+	echo -e ""
+	rm -rf $tmpPath/$domain/httpx.txt
+fi

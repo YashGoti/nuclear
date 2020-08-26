@@ -1,0 +1,16 @@
+#!/bin/bash
+
+tmpPath=$(cat config.json | jq -r .[].paths[].tmpPath | grep -ivE null)
+outPath=$(cat config.json | jq -r .[].paths[].outPath | grep -ivE null)
+
+if [[ -z $@ ]];then
+	echo -e "subs : Specify Target Domain"
+else
+	domain=$1
+	mkdir -p $tmpPath $tmpPath/$domain $outPath $outPath/$domain
+	tools/subfinder -d $domain -all -silent > $tmpPath/$domain/subfinder.tmp.txt &
+	tools/assetfinder -subs-only $domain > $tmpPath/$domain/assetfinder.tmp.txt
+	cat $tmpPath/$domain/subfinder.tmp.txt $tmpPath/$domain/assetfinder.tmp.txt | sort -u | tee $outPath/$domain/subdomains.txt
+	rm -rf $tmpPath/$domain/subfinder.tmp.txt $tmpPath/$domain/assetfinder.tmp.txt
+	echo -e ""
+fi

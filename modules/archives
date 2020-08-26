@@ -1,0 +1,19 @@
+#!/bin/bash
+
+tmpPath=$(cat config.json | jq -r .[].paths[].tmpPath | grep -ivE null)
+outPath=$(cat config.json | jq -r .[].paths[].outPath | grep -ivE null)
+
+if [[ -z $@ ]];then
+	echo -e "subs : Specify Target Domain"
+else
+	domain=$1
+	file=$2
+	mkdir -p $tmpPath $tmpPath/$domain $outPath $outPath/$domain $outPath/$domain/archives
+	while read -r host
+	do
+		echo -ne "$host\t\t\t\t\t\r"
+		tools/gau $host >> $outPath/$domain/archives/$host.txt
+		echo -e "[archives] :$host [$(cat $outPath/$domain/archives/$host.txt | wc -l)]"
+	done < $2
+	echo -e ""
+fi
