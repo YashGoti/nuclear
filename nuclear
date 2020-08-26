@@ -1,0 +1,15 @@
+#!/bin/bash
+
+tmpPath=$(cat config.json | jq -r .[].paths[].tmpPath | grep -ivE null)
+outPath=$(cat config.json | jq -r .[].paths[].outPath | grep -ivE null)
+
+if [[ -z $@ ]];then
+	echo -e "nuclear : Specify Target Domain"
+else
+	domain=$1
+
+	modules/subs $domain
+	modules/subtakeover $domain $outPath/$domain/subdomains.txt &
+	modules/sublive $domain $outPath/$domain/subdomains.txt &
+	modules/archives $domain $outPath/$domain/subdomains.txt
+fi
