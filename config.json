@@ -1,3 +1,3 @@
 [
-	{"paths": [{"tmpPath": "/root/.tmp"},{"outPath": "/root/nuclear-recon"},"toolPath": "./tools/"]}
+	{"paths": [{"tmpPath": "/root/.tmp"},{"outPath": "/root/nuclear-recon"},{"toolPath": "./tools/"]}
 ]
